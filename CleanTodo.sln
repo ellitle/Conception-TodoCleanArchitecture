@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33627.172
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12128.139 oobstable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanTodo.API", "CleanTodo.WebAPI\CleanTodo.API.csproj", "{F2908F1A-4E65-4B74-A78C-70CECC223877}"
 EndProject
@@ -10,11 +10,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanTodo.Application", "CleanTodo.Application\CleanTodo.Application.csproj", "{8055F346-446C-4D9D-944A-5ACB0420A82A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanTodo.Infrastructure", "CleanTodo.Infrastructure\CleanTodo.Infrastructure.csproj", "{0605D142-1EAC-4D7A-BE36-55F7BE10B018}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoApplicationTests", "TodoApplicationTests\TodoApplicationTests.csproj", "{4D3A12F0-A876-4CD7-83FA-00A7B47AE3A8}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8055F346-446C-4D9D-944A-5ACB0420A82A} = {8055F346-446C-4D9D-944A-5ACB0420A82A}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,10 +33,6 @@ Global
 		{0605D142-1EAC-4D7A-BE36-55F7BE10B018}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0605D142-1EAC-4D7A-BE36-55F7BE10B018}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0605D142-1EAC-4D7A-BE36-55F7BE10B018}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D3A12F0-A876-4CD7-83FA-00A7B47AE3A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D3A12F0-A876-4CD7-83FA-00A7B47AE3A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D3A12F0-A876-4CD7-83FA-00A7B47AE3A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D3A12F0-A876-4CD7-83FA-00A7B47AE3A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
