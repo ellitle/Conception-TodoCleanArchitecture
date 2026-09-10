@@ -6,6 +6,7 @@ public class Todo
     public string Text { get; set; }
     public bool IsCompleted { get; set; }
     public DateTime Date { get; set; }
+    public DateTime CompetedOn { get; set; }
 
     /// <summary>
     /// Constructeur qui crée mon guid, date
@@ -18,6 +19,4 @@ public class Todo
         Date = DateTime.Now;
         IsCompleted = false;
     }
-
-    public Todo() { }
 }
