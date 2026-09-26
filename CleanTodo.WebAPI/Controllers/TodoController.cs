@@ -1,48 +1,32 @@
 using CleanTodo.Application.UseCase;
 using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Exceptions;
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TodoController : ControllerBase
+public class TodoController(
+    GetAllTodosUseCase getAllUseCase,
+    GetTodoUseCase getTodoUseCase,
+    CreateTodoUseCase createTodoUseCase,
+    UpdateTodoUseCase updateTodoUseCase,
+    DeleteTodoUseCase deleteTodoUseCase,
+    ToggleCompleteStatusTodoUseCase toggleTodoCompleteStatusUseCase) : ControllerBase
 {
-    private GetAllTodosUseCase _getAllUseCase;
-    private GetTodoUseCase _getTodoUseCase;
-
-    public TodoController(GetAllTodosUseCase getAllUseCase, GetTodoUseCase getTodoUseCase)
-    {
-        _getAllUseCase = getAllUseCase;
-        _getTodoUseCase = getTodoUseCase;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TodoDto>>> GetAll()
     {
-        var todos = await _getAllUseCase.Execute();
-        return Ok(todos);
+        return Ok(await getAllUseCase.Execute());
     }
 
-    //Cadeau! pour le create. On utilise un CreatedAtAction qui retourne un code http 201 et un header location avec l'url du nouvel élément créé.
-    //
-    //[HttpPost]
-    //public async Task<ActionResult<TodoDto>> Create([FromBody] CreateTodoDto createTodoDto)
-    //{
-    //    TodoDto todo = await _createUseCase.Execute(createTodoDto);
-
-    //    return CreatedAtAction(
-    //        nameof(Get),
-    //        new { id = todo.Id },
-    //        todo);
-    //}
-
-    [HttpGet("{id}")] // /api/todo/ton_id
-    public async Task<IActionResult> Get(Guid id)
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<TodoDto>> Get(Guid id)
     {
         try
         {
-            TodoDto todo = await _getTodoUseCase.Execute(id);
-            return Ok(todo);
+            return Ok(await getTodoUseCase.Execute(id));
         }
         catch (NotFoundException)
         {
@@ -50,6 +34,73 @@ public class TodoController : ControllerBase
         }
     }
 
-    // Pour le delete et le update, tu peux retourn un noContent (http 204) qui dit :"Ça fonctionné, je n'ai rien à te retourner"
-    //return NoContent();
+    [HttpPost]
+    public async Task<ActionResult<TodoDto>> Create([FromBody] CreateTodoDto createTodoDto)
+    {
+        try
+        {
+            var todo = await createTodoUseCase.Execute(createTodoDto);
+            return CreatedAtAction(nameof(Get), new { id = todo.Id }, todo);
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(ToValidationResponse(exception));
+        }
+    }
+
+    [Authorize]
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<TodoDto>> Update(Guid id, [FromBody] UpdateTodoDto updateTodoDto)
+    {
+        try
+        {
+            return Ok(await updateTodoUseCase.Execute(id, updateTodoDto));
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(ToValidationResponse(exception));
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [Authorize]
+    [HttpPatch("{id:guid}/toggle")]
+    public async Task<ActionResult<TodoDto>> Toggle(Guid id)
+    {
+        try
+        {
+            return Ok(await toggleTodoCompleteStatusUseCase.Execute(id));
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        try
+        {
+            await deleteTodoUseCase.Execute(id);
+            return NoContent();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    private static object ToValidationResponse(ValidationException exception) => new
+    {
+        errors = exception.Errors
+            .GroupBy(error => error.PropertyName)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(error => error.ErrorMessage).ToArray())
+    };
 }

@@ -1,4 +1,5 @@
 ﻿using CleanTodo.Application.UseCase;
+using CleanTodo.Application.UseCases;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -15,7 +16,10 @@ public static class DependencyInjection
         services.AddScoped<DeleteTodoUseCase>();
         services.AddScoped<GetTodoUseCase>();
         services.AddScoped<GetAllTodosUseCase>();
-        services.AddScoped<ToggleTodoCompleteStatusUseCase>();
+        services.AddScoped<ToggleCompleteStatusTodoUseCase>();
+        services.AddScoped<UpdateTodoUseCase>();
+        services.AddScoped<RegisterUserUseCase>();
+        services.AddScoped<LoginUserUseCase>();
 
         return services;
     }

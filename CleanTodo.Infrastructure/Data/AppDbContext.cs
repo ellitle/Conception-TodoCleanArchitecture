@@ -8,6 +8,7 @@ public class AppDbContext : DbContext
     {
     }
     public DbSet<Todo> Todos { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

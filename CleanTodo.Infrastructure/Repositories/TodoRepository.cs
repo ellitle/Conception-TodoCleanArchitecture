@@ -1,4 +1,5 @@
-﻿using CleanTodo.Domain.Entities;
+﻿using CleanTodo.Domain.DTOS;
+using CleanTodo.Domain.Entities;
 using CleanTodo.Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -29,5 +30,19 @@ public class TodoRepository : ITodoRepository
         return await _context.Todos
             .Where(x => x.Id == id)
             .SingleOrDefaultAsync();
+    }
+
+    public async Task<Todo> Delete(Todo todo)
+    {
+        EntityEntry<Todo> deletedTodo = _context.Todos.Remove(todo); // appelle la méthode Remove
+        await _context.SaveChangesAsync(); // sauvegarde les changements dans la base de données
+        return deletedTodo.Entity; // retourne l'entité supprimée.
+    }
+
+    public async Task<Todo> Update(Todo todo)
+    {
+        EntityEntry<Todo> updatedTodo = _context.Todos.Update(todo); // appelle la méthode Update
+        await _context.SaveChangesAsync(); // sauvegarde les changements dans la base de données
+        return updatedTodo.Entity;
     }
 }

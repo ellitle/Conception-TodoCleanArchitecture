@@ -11,6 +11,8 @@ public class CreateTodoValidation : AbstractValidator<CreateTodoDto>
     {
         RuleFor(x => x.Title)
             .NotEmpty()
+            .Must(title => !string.IsNullOrWhiteSpace(title))
+            .WithMessage("Le titre ne peut pas contenir seulement des espaces.")
             .MinimumLength(3)
             .MaximumLength(200);
 

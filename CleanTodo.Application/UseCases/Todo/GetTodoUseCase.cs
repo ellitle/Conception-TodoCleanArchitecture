@@ -14,7 +14,7 @@ public class GetTodoUseCase
         _todoRepository = todoRepository;
     }
 
-    public async Task<TodoDto> Execute(Guid id)
+    public async Task<TodoDto>  Execute(Guid id)
     {
         Todo? todo = await _todoRepository.FindById(id);
         if (todo == null)

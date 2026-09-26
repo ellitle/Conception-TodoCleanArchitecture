@@ -3,9 +3,10 @@
 public class Todo
 {
     public Guid Id { get; set; }
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
     public bool IsCompleted { get; set; }
     public DateTime Date { get; set; }
+    public DateTime? CompletedOn { get; set; }
 
     /// <summary>
     /// Constructeur qui crée mon guid, date
@@ -15,7 +16,7 @@ public class Todo
     {
         Text = text;
         Id = Guid.NewGuid();
-        Date = DateTime.Now;
+        Date = DateTime.UtcNow;
         IsCompleted = false;
     }
 
