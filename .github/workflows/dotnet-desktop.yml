@@ -1,0 +1,191 @@
+name: Deploy API to VPS
+
+on:
+  push:
+    branches:
+      - student
+  workflow_dispatch:
+
+concurrency:
+  group: cleantodo-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Test, publish, and deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      API_PROJECT: CleanTodo.WebAPI/CleanTodo.API.csproj
+      VPS_PORT: ${{ vars.VPS_PORT || '22' }}
+      VPS_DEPLOY_ROOT: ${{ vars.VPS_DEPLOY_ROOT || '/var/www/cleantodo' }}
+      VPS_SERVICE_NAME: ${{ vars.VPS_SERVICE_NAME || 'cleantodo' }}
+      VPS_HEALTH_URL: ${{ vars.VPS_HEALTH_URL || 'http://127.0.0.1:5000/health' }}
+
+    steps:
+      - name: Check out the student branch
+        uses: actions/checkout@v4
+
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore CleanTodo.sln
+
+      - name: Run tests
+        run: dotnet test CleanTodo.sln --configuration Release --no-restore
+
+      - name: Publish the API for Linux
+        run: >-
+          dotnet publish "$API_PROJECT"
+          --configuration Release
+          --runtime linux-x64
+          --self-contained true
+          --output publish
+
+      - name: Create deployment archive
+        shell: bash
+        run: tar -C publish -czf cleantodo-api.tar.gz .
+
+      - name: Configure SSH
+        shell: bash
+        env:
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$VPS_SSH_PRIVATE_KEY" ] || [ -z "$VPS_KNOWN_HOSTS" ]; then
+            echo "The VPS_SSH_PRIVATE_KEY and VPS_KNOWN_HOSTS secrets are required." >&2
+            exit 1
+          fi
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload release to the VPS
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          if [ -z "$VPS_HOST" ] || [ -z "$VPS_USER" ]; then
+            echo "The VPS_HOST and VPS_USER secrets are required." >&2
+            exit 1
+          fi
+          release_id="${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          archive_name="cleantodo-${release_id}.tar.gz"
+          scp \
+            -i ~/.ssh/deploy_key \
+            -P "$VPS_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            cleantodo-api.tar.gz \
+            "$VPS_USER@$VPS_HOST:/tmp/$archive_name"
+
+      - name: Activate release and restart the API
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}name: Deploy API to VPS
+
+on:
+  push:
+    branches:
+      - student
+  workflow_dispatch:
+
+concurrency:
+  group: cleantodo-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Test, publish, and deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      API_PROJECT: CleanTodo.WebAPI/CleanTodo.API.csproj
+      VPS_PORT: ${{ vars.VPS_PORT || '22' }}
+      VPS_DEPLOY_ROOT: ${{ vars.VPS_DEPLOY_ROOT || '/var/www/cleantodo' }}
+      VPS_SERVICE_NAME: ${{ vars.VPS_SERVICE_NAME || 'cleantodo' }}
+      VPS_HEALTH_URL: ${{ vars.VPS_HEALTH_URL || 'http://127.0.0.1:5000/health' }}
+
+    steps:
+      - name: Check out the student branch
+        uses: actions/checkout@v4
+
+      - name: Install .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore CleanTodo.sln
+
+      - name: Run tests
+        run: dotnet test CleanTodo.sln --configuration Release --no-restore
+
+      - name: Publish the API for Linux
+        run: >-
+          dotnet publish "$API_PROJECT"
+          --configuration Release
+          --runtime linux-x64
+          --self-contained true
+          --output publish
+
+      - name: Create deployment archive
+        shell: bash
+        run: tar -C publish -czf cleantodo-api.tar.gz .
+
+      - name: Configure SSH
+        shell: bash
+        env:
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$VPS_SSH_PRIVATE_KEY" ] || [ -z "$VPS_KNOWN_HOSTS" ]; then
+            echo "The VPS_SSH_PRIVATE_KEY and VPS_KNOWN_HOSTS secrets are required." >&2
+            exit 1
+          fi
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload release to the VPS
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          if [ -z "$VPS_HOST" ] || [ -z "$VPS_USER" ]; then
+            echo "The VPS_HOST and VPS_USER secrets are required." >&2
+            exit 1
+          fi
+          release_id="${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          archive_name="cleantodo-${release_id}.tar.gz"
+          scp \
+            -i ~/.ssh/deploy_key \
+            -P "$VPS_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            cleantodo-api.tar.gz \
+            "$VPS_USER@$VPS_HOST:/tmp/$archive_name"
+
+      - name: Activate release and restart the API
+        shell: bash
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
