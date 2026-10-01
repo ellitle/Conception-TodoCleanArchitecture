@@ -27,6 +27,6 @@ public class LoginUserUseCase
         if (user is null || !PasswordHasher.VerifyPassword(loginUserDto.Password, user.Password))
             throw new InvalidCredentialsException();
 
-        return new UserDto(user);
+        return new UserDto(user); 
     }
 }
