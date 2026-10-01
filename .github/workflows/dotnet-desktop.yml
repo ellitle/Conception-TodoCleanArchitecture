@@ -70,6 +70,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "publish/*"
           target: "/var/www/cleantodo-publish/"
           strip_components: 1
