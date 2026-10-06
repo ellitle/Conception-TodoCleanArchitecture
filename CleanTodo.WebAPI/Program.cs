@@ -68,6 +68,13 @@ public class Program
                 }
             });
         });
+        builder.Services.AddCors(options => {
+            options.AddPolicy("AllowAll", policy => {
+                policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
+        });
 
         var app = builder.Build();
 
@@ -84,6 +91,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
+        app.UseCors("AllowAll");
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
