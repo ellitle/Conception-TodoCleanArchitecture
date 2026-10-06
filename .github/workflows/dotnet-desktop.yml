@@ -59,19 +59,22 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             set -e
             systemctl stop cleantodo
-            rm -rf /var/www/cleantodo-publish/*
-            mkdir -p /var/www/cleantodo-publish
+            rm -rf /var/www/myapi/*
+            mkdir -p /var/www/myapi
+            
       - name: Deploy to VPS
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "publish/*"
-          target: "/var/www/cleantodo-publish/"
+          target: "/var/www/myapi/"
           strip_components: 1
           overwrite: true
 
@@ -81,7 +84,9 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             set -e
+            chown -R www-data:www-data /var/www/myapi
             systemctl start cleantodo
             systemctl status cleantodo --no-pager
