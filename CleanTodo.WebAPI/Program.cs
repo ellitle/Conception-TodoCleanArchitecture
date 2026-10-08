@@ -110,6 +110,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapHealthChecks("/health");
+        app.MapGet("/api/ping", () => Results.Text("pong", "text/plain")).AllowAnonymous();
         app.MapControllers();
         app.Run();
     }

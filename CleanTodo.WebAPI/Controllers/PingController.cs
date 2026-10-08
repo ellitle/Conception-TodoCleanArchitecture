@@ -12,7 +12,7 @@ public class PingController() : ControllerBase
 {
     [AllowAnonymous]
     [HttpPost]
-    [Route("/ping")]
+    [Route("/api/ping")]
 
     public IActionResult Ping()
     {
