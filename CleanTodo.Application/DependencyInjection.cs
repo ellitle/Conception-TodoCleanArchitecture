@@ -1,4 +1,5 @@
-﻿using CleanTodo.Application.UseCase;
+﻿using CleanTodo.Application.Service;
+using CleanTodo.Application.UseCase;
 using CleanTodo.Application.UseCases;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,15 +13,24 @@ public static class DependencyInjection
     {
         // cette ligne ajoute les validators
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        services.AddScoped<CreateTodoUseCase>();
-        services.AddScoped<DeleteTodoUseCase>();
-        services.AddScoped<GetTodoUseCase>();
-        services.AddScoped<GetAllTodosUseCase>();
+        services.AddScoped<GetAllShipsUseCase>();
+        services.AddScoped<GetShipUseCase>();
+        services.AddScoped<GetPortUseCase>();
+        services.AddScoped<CreateShipUseCase>();
+        services.AddScoped<UpdateShipUseCase>();
+        services.AddScoped<DeleteShipUseCase>();
+        services.AddScoped<SailShipUseCase>();
+        services.AddScoped<DockShipUseCase>();
+        services.AddScoped<GetShipTransferUseCase>();
+
+        services.AddScoped<JwtService>();
+        services.AddScoped<PasswordHasher>();
+
         services.AddScoped<ToggleCompleteStatusTodoUseCase>();
-        services.AddScoped<UpdateTodoUseCase>();
+
         services.AddScoped<RegisterUserUseCase>();
         services.AddScoped<LoginUserUseCase>();
-
+        
         return services;
     }
 }

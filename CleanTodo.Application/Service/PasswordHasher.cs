@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CleanTodo.Application.Service
 {
-    public static class PasswordHasher
+    public class PasswordHasher
     {
         public static string HashPassword(string password)
         {

@@ -21,6 +21,80 @@ namespace CleanTodo.Infrastructure.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("CleanTodo.Domain.Entities.Ship", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Captain")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("captain");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("createdAt")
+                        .HasDefaultValueSql("UTC_TIMESTAMP(6)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("createdBy");
+
+                    b.Property<int>("CrewSize")
+                        .HasColumnType("int")
+                        .HasColumnName("crewSize");
+
+                    b.Property<decimal>("GoldCargo")
+                        .HasPrecision(35, 28)
+                        .HasColumnType("decimal(35,28)")
+                        .HasColumnName("goldCargo");
+
+                    b.Property<DateTime>("LastModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("lastModified")
+                        .HasDefaultValueSql("UTC_TIMESTAMP(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(7)
+                        .HasColumnType("varchar(7)")
+                        .HasDefaultValue("docked")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PirateShips", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_PirateShips_Captain", "CHAR_LENGTH(TRIM(`captain`)) BETWEEN 2 AND 50");
+
+                            t.HasCheckConstraint("CK_PirateShips_CreatedBy", "CHAR_LENGTH(TRIM(`createdBy`)) > 0");
+
+                            t.HasCheckConstraint("CK_PirateShips_CrewSize", "`crewSize` BETWEEN 1 AND 500");
+
+                            t.HasCheckConstraint("CK_PirateShips_GoldCargo", "`goldCargo` BETWEEN 0 AND 1000000");
+
+                            t.HasCheckConstraint("CK_PirateShips_LastModified", "`lastModified` >= `createdAt`");
+
+                            t.HasCheckConstraint("CK_PirateShips_Name", "CHAR_LENGTH(TRIM(`name`)) BETWEEN 2 AND 100");
+
+                            t.HasCheckConstraint("CK_PirateShips_Status", "BINARY `status` IN ('docked', 'sailing')");
+                        });
+                });
+
             modelBuilder.Entity("CleanTodo.Domain.Entities.Todo", b =>
                 {
                     b.Property<Guid>("Id")
