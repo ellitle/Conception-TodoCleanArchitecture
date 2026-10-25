@@ -13,6 +13,7 @@ public static class DependencyInjection
     {
         // cette ligne ajoute les validators
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
         services.AddScoped<GetAllShipsUseCase>();
         services.AddScoped<GetShipUseCase>();
         services.AddScoped<GetPortUseCase>();
@@ -22,6 +23,12 @@ public static class DependencyInjection
         services.AddScoped<SailShipUseCase>();
         services.AddScoped<DockShipUseCase>();
         services.AddScoped<GetShipTransferUseCase>();
+
+        services.AddScoped<GetAllTodosUseCase>();
+        services.AddScoped<GetTodoUseCase>();
+        services.AddScoped<CreateTodoUseCase>();
+        services.AddScoped<UpdateTodoUseCase>();
+        services.AddScoped<DeleteTodoUseCase>();
 
         services.AddScoped<JwtService>();
         services.AddScoped<PasswordHasher>();
