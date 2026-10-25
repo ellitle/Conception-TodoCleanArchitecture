@@ -12,7 +12,8 @@ public class ShipController(
     GetShipUseCase getShipUseCase,
     CreateShipUseCase createShipUseCase,
     UpdateShipUseCase updateShipUseCase,
-    DeleteShipUseCase deleteShipUseCase) : ControllerBase
+    DeleteShipUseCase deleteShipUseCase,
+    DockShipUseCase dockShipUseCase) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ShipDto>>> GetAll()
@@ -77,6 +78,22 @@ public class ShipController(
         catch (NotFoundException)
         {
             return NotFound();
+        }
+    }
+
+    [HttpPost("dock")]
+    public async Task<ActionResult<ShipDto>> Dock(
+    [FromBody] BrokerShipDto brokerShipDto)
+    {
+        try
+        {
+            var ship = await dockShipUseCase.Execute(brokerShipDto);
+
+            return CreatedAtAction(nameof(Get), new { id = ship.Id }, ship);
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(ToValidationResponse(exception));
         }
     }
 
