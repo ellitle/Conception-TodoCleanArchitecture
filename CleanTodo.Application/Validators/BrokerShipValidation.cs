@@ -36,10 +36,6 @@ public class BrokerShipValidation : AbstractValidator<BrokerShipDto>
         RuleFor(x => x.CreatedAt)
             .NotEmpty();
 
-        RuleFor(x => x.LastModified)
-            .NotEmpty()
-            .GreaterThanOrEqualTo(x => x.CreatedAt);
-
         RuleFor(x => x.Status)
             .Equal("sailing");
     }

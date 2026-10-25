@@ -29,7 +29,7 @@ public class DockShipUseCase
         Ship ship = new Ship(brokerShipDto.Name, brokerShipDto.Captain, brokerShipDto.GoldCargo, brokerShipDto.CrewSize, brokerShipDto.CreatedBy);
 
         ship.CreatedAt = brokerShipDto.CreatedAt.UtcDateTime;
-        ship.LastModified = brokerShipDto.LastModified.UtcDateTime;
+        ship.LastModified = DateTime.UtcNow;
 
         Ship createdShip = await _shipRepository.Add(ship);
 
