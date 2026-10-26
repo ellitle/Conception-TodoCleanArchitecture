@@ -25,6 +25,15 @@ public class ShipOperationException : Exception
             ShipErrorCode.BrokerUnavailable =>
                 "Le Broker est indisponible.",
 
+            ShipErrorCode.AlreadySailing =>
+                "Le navire est déjà en navigation.",
+
+            ShipErrorCode.BrokerRejected =>
+                "Le broker a refusé l'envoi du navire.",
+
+            ShipErrorCode.DeliveryUnknown =>
+                "La livraison n'a pas pu être confirmée. Le navire reste en navigation pour éviter un double envoi.",
+
             _ => "Une erreur est survenue."
         };
     }

@@ -1,4 +1,4 @@
-﻿using CleanTodo.Domain.DTOS;
+using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Exceptions;
 using CleanTodo.Domain.Interfaces.Gateways;
 using CleanTodo.Domain.Interfaces.Repositories;
@@ -7,23 +7,35 @@ namespace CleanTodo.Application.UseCase;
 
 public class SailShipUseCase
 {
-    private readonly IShipTransferRepository _shipTransferRepository;
+    private readonly IShipRepository _shipRepository;
     private readonly IBrokerGateway _brokerGateway;
 
-    public SailShipUseCase(IShipTransferRepository shipTransferRepository, IBrokerGateway brokerGateway)
+    public SailShipUseCase(IShipRepository shipRepository, IBrokerGateway brokerGateway)
     {
-        _shipTransferRepository = shipTransferRepository;
+        _shipRepository = shipRepository;
         _brokerGateway = brokerGateway;
     }
 
-    public async Task<ShipTransferDto> Execute( Guid id, SailShipDto sailShipDto)
+    public async Task<ShipDto> Execute(Guid id, SailShipDto sailShipDto)
     {
-        if (string.IsNullOrWhiteSpace(sailShipDto.Destination)|| sailShipDto.Destination.Length > 200)
+        if (string.IsNullOrWhiteSpace(sailShipDto.Destination) || sailShipDto.Destination.Length > 200)
         {
             throw new ShipOperationException(ShipErrorCode.InvalidDestination);
         }
 
-        var ports = await _brokerGateway.GetPorts();
+        List<string> ports;
+        try
+        {
+            ports = await _brokerGateway.GetPorts();
+        }
+        catch (HttpRequestException)
+        {
+            throw new ShipOperationException(ShipErrorCode.BrokerUnavailable);
+        }
+        catch (OperationCanceledException)
+        {
+            throw new ShipOperationException(ShipErrorCode.BrokerUnavailable);
+        }
 
         bool destinationExists = ports.Contains(sailShipDto.Destination);
 
@@ -32,9 +44,8 @@ public class SailShipUseCase
             throw new ShipOperationException(ShipErrorCode.InvalidDestination);
         }
 
-        var startedTransfer = await _shipTransferRepository.BeginTransfer(id, sailShipDto.Destination);
-
-        BrokerShipDto brokerShipDto = new BrokerShipDto(startedTransfer.Ship);
+        var ship = await _shipRepository.BeginSail(id);
+        var brokerShipDto = new BrokerShipDto(ship);
 
         DeliveryOutcome outcome;
 
@@ -51,8 +62,20 @@ public class SailShipUseCase
             outcome = DeliveryOutcome.Unknown;
         }
 
-        var completedTransfer = await _shipTransferRepository.FinishTransfer(startedTransfer.Transfer.Id, outcome);
+        if (outcome == DeliveryOutcome.Rejected)
+        {
+            ship.Status = "docked";
+            ship.LastModified = DateTime.UtcNow;
+            await _shipRepository.Update(ship);
+            throw new ShipOperationException(ShipErrorCode.BrokerRejected);
+        }
 
-        return new ShipTransferDto(completedTransfer);
+        if (outcome != DeliveryOutcome.Confirmed)
+        {
+            // Keep the ship sailing when delivery is uncertain to prevent a duplicate send.
+            throw new ShipOperationException(ShipErrorCode.DeliveryUnknown);
+        }
+
+        return new ShipDto(ship);
     }
 }

@@ -1,5 +1,3 @@
-﻿using CleanTodo.Domain.Enums;
-
 namespace CleanTodo.Domain.Entities;
 
 public class Ship
@@ -9,7 +7,7 @@ public class Ship
     public string Captain { get; set; } = string.Empty;
     public decimal GoldCargo { get; set; }
     public int CrewSize { get; set; }
-    public ShipStatus Status { get; set; }
+    public string Status { get; set; } = "docked";
     public DateTime CreatedAt { get; set; }
     public DateTime LastModified { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
@@ -24,7 +22,7 @@ public class Ship
         GoldCargo = goldCargo;
         CrewSize = crewSize;
         CreatedBy = createdBy;
-        Status = ShipStatus.Docked;
+        Status = "docked";
         CreatedAt = now;
         LastModified = now;
     }

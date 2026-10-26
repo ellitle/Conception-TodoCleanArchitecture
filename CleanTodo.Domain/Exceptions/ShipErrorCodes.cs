@@ -5,5 +5,8 @@ public enum ShipErrorCode
     NotFound,
     PortFull,
     InvalidDestination,
-    BrokerUnavailable
+    BrokerUnavailable,
+    AlreadySailing,
+    BrokerRejected,
+    DeliveryUnknown
 }

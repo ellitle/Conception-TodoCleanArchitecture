@@ -1,5 +1,5 @@
-﻿using CleanTodo.Domain.Entities;
-using CleanTodo.Domain.Enums;
+using CleanTodo.Domain.Entities;
+
 
 namespace CleanTodo.Domain.DTOS
 {
@@ -13,7 +13,7 @@ namespace CleanTodo.Domain.DTOS
         public string CreatedBy { get; set; } = string.Empty;
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset LastModified { get; set; }
-        public ShipStatus Status { get; set; }
+        public string Status { get; set; } = "docked";
 
         public ShipDto() { }
 

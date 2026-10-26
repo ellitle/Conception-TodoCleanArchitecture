@@ -68,6 +68,7 @@ namespace CleanTodo.Infrastructure.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("Status")
+                        .IsConcurrencyToken()
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(7)

@@ -13,6 +13,7 @@ public class ShipController(
     CreateShipUseCase createShipUseCase,
     UpdateShipUseCase updateShipUseCase,
     DeleteShipUseCase deleteShipUseCase,
+    SailShipUseCase sailShipUseCase,
     DockShipUseCase dockShipUseCase,
     GetPortUseCase getPortUseCase) : ControllerBase
 {
@@ -95,6 +96,43 @@ public class ShipController(
         catch (ValidationException exception)
         {
             return BadRequest(ToValidationResponse(exception));
+        }
+    }
+
+    [HttpPost("sail")]
+    public async Task<ActionResult<ShipDto>> Sail(
+        [FromQuery] Guid id,
+        [FromBody] SailShipDto sailShipDto)
+    {
+        if (id == Guid.Empty)
+        {
+            return BadRequest(new { message = "L'ID du navire est requis." });
+        }
+
+        try
+        {
+            return Ok(await sailShipUseCase.Execute(id, sailShipDto));
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(ToValidationResponse(exception));
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ShipOperationException exception)
+        {
+            return StatusCode(exception.Code switch
+            {
+                ShipErrorCode.NotFound => StatusCodes.Status404NotFound,
+                ShipErrorCode.BrokerUnavailable => StatusCodes.Status503ServiceUnavailable,
+                ShipErrorCode.PortFull => StatusCodes.Status409Conflict,
+                ShipErrorCode.AlreadySailing => StatusCodes.Status409Conflict,
+                ShipErrorCode.BrokerRejected => StatusCodes.Status502BadGateway,
+                ShipErrorCode.DeliveryUnknown => StatusCodes.Status503ServiceUnavailable,
+                _ => StatusCodes.Status400BadRequest
+            }, new { message = exception.Message });
         }
     }
 

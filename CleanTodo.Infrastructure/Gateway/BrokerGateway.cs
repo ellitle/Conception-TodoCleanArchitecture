@@ -31,12 +31,37 @@ public class BrokerGateway : IBrokerGateway
             ?? new List<string>();
     }
 
-    public Task<DeliveryOutcome> Sail(
-        string destination,
-        BrokerShipDto ship)
+   
+    public async Task<DeliveryOutcome> Sail(string destination, BrokerShipDto ship)
     {
-        // A finir plus tard avec la route et le contrat du broker.
-        throw new NotImplementedException(
-            "Le contrat HTTP de Sail doit être confirmé.");
+        var payload = new
+        {
+            name = ship.Name,
+            captain = ship.Captain,
+            goldCargo = ship.GoldCargo,
+            crewSize = ship.CrewSize,
+            createdBy = ship.CreatedBy,
+            createdAt = ship.CreatedAt,
+            lastModified = DateTime.UtcNow,
+            status = "sailing"
+        };
+
+        var path = $"ship/sail/{Uri.EscapeDataString(destination)}";
+
+        using var response = await _httpClient.PostAsJsonAsync(
+            path,
+            payload
+        );
+
+        if (response.IsSuccessStatusCode)
+        {
+            return DeliveryOutcome.Confirmed;
+        }
+
+        // A timeout or server error can occur after the broker has accepted the ship.
+        var statusCode = (int)response.StatusCode;
+        return statusCode >= 400 && statusCode < 500 && statusCode != 408
+            ? DeliveryOutcome.Rejected
+            : DeliveryOutcome.Unknown;
     }
 }

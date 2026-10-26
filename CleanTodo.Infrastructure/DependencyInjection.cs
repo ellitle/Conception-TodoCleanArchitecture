@@ -51,7 +51,6 @@ public static class DependencyInjection
         services.AddScoped<ITodoRepository, TodoRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IShipRepository, ShipRepository>();
-        services.AddScoped<IShipTransferRepository, ShipTransferRepository>();
         return services;
     }
 }

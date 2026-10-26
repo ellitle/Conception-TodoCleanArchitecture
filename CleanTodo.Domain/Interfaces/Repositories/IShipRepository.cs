@@ -9,4 +9,5 @@ public interface IShipRepository
     Task<Ship> Update(Ship ship);
     Task<List<Ship>> GetAll();
     Task<Ship?> FindById(Guid id);
+    Task<Ship> BeginSail(Guid id);
 }

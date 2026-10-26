@@ -1,6 +1,5 @@
-﻿using CleanTodo.Domain.Entities;
+using CleanTodo.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using CleanTodo.Domain.Enums;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 public class ShipConfiguration : IEntityTypeConfiguration<Ship>
@@ -30,10 +29,8 @@ public class ShipConfiguration : IEntityTypeConfiguration<Ship>
         builder.Property(ship => ship.CrewSize).HasColumnName("crewSize").IsRequired();
 
         builder.Property(ship => ship.Status).HasColumnName("status")
-            .HasConversion(
-                status => status == ShipStatus.Docked ? "docked" : status == ShipStatus.Sailing ? "sailing" : "invalid",
-                status => status == "docked" ? ShipStatus.Docked : ShipStatus.Sailing)
-            .HasMaxLength(7).HasDefaultValue(ShipStatus.Docked).IsRequired();
+            .IsConcurrencyToken()
+            .HasMaxLength(7).HasDefaultValue("docked").IsRequired();
 
         builder.Property(ship => ship.CreatedBy).HasColumnName("createdBy").IsRequired().HasMaxLength(200);
 

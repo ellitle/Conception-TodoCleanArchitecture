@@ -1,5 +1,6 @@
 using CleanTodo.Domain.Entities;
 using CleanTodo.Domain.Interfaces.Repositories;
+using CleanTodo.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -34,6 +35,32 @@ public class ShipRepository : IShipRepository
         await _context.SaveChangesAsync();
 
         return newShip.Entity;
+    }
+
+    public async Task<Ship> BeginSail(Guid id)
+    {
+        var ship = await FindById(id)
+            ?? throw new ShipOperationException(ShipErrorCode.NotFound);
+
+        if (ship.Status != "docked")
+        {
+            throw new ShipOperationException(ShipErrorCode.AlreadySailing);
+        }
+
+        ship.Status = "sailing";
+        ship.LastModified = DateTime.UtcNow;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            await _context.Entry(ship).ReloadAsync();
+            throw new ShipOperationException(ShipErrorCode.AlreadySailing);
+        }
+
+        return ship;
     }
 
     public async Task<Ship> Delete(Ship ship)
