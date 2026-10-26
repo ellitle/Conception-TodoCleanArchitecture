@@ -76,6 +76,7 @@ public class SailShipUseCase
             throw new ShipOperationException(ShipErrorCode.DeliveryUnknown);
         }
 
+        await _shipRepository.Delete(ship);
         return new ShipDto(ship);
     }
 }
