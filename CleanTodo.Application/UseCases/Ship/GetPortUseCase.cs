@@ -12,7 +12,7 @@ public class GetPortUseCase
         _brokerGateway = brokerGateway;
     }
 
-    public async Task<List<PortDto>> Execute()
+    public async Task<List<string>> Execute()
     {
         return await _brokerGateway.GetPorts();
     }

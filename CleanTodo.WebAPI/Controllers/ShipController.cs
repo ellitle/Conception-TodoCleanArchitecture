@@ -13,7 +13,8 @@ public class ShipController(
     CreateShipUseCase createShipUseCase,
     UpdateShipUseCase updateShipUseCase,
     DeleteShipUseCase deleteShipUseCase,
-    DockShipUseCase dockShipUseCase) : ControllerBase
+    DockShipUseCase dockShipUseCase,
+    GetPortUseCase getPortUseCase) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ShipDto>>> GetAll()
@@ -95,6 +96,12 @@ public class ShipController(
         {
             return BadRequest(ToValidationResponse(exception));
         }
+    }
+
+    [HttpGet("port")]
+    public async Task<ActionResult<List<string>>> Port()
+    {
+        return Ok(await getPortUseCase.Execute());
     }
 
     private static object ToValidationResponse(ValidationException exception) => new

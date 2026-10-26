@@ -6,6 +6,6 @@ public enum DeliveryOutcome { Confirmed, Rejected, Unknown }
 public interface IBrokerGateway
 {
     string CreatorId { get; }
-    Task<List<PortDto>> GetPorts();
+    Task<List<string>> GetPorts();
     Task<DeliveryOutcome> Sail(string destination, BrokerShipDto ship);
 }

@@ -6,6 +6,7 @@ using CleanTodo.Infrastructure.Repositories;
 using CleanTodo.Domain.Interfaces.Gateways;
 using CleanTodo.Infrastructure.Configuration;
 using CleanTodo.Infrastructure.Gateways;
+using System.Net.Http.Headers;
 
 namespace CleanTodo.Infrastructure;
 
@@ -25,11 +26,25 @@ public static class DependencyInjection
         ));
 
         var brokerConfiguration = configuration.GetSection("Broker").Get<BrokerConfiguration>()
-            ?? new BrokerConfiguration();
+            ?? throw new InvalidOperationException("Section Broker manquante.");
         services.AddSingleton(brokerConfiguration);
         services.AddHttpClient<IBrokerGateway, BrokerGateway>(client =>
         {
+            if (string.IsNullOrWhiteSpace(brokerConfiguration.BaseUrl))
+                throw new InvalidOperationException("Broker:BaseUrl manquant.");
+
+            if (string.IsNullOrWhiteSpace(brokerConfiguration.ClientId))
+                throw new InvalidOperationException("Broker:ClientId manquant.");
+
+            if (string.IsNullOrWhiteSpace(brokerConfiguration.AppToken))
+                throw new InvalidOperationException("Broker:AppToken manquant.");
+
             client.BaseAddress = new Uri(brokerConfiguration.BaseUrl.TrimEnd('/') + "/");
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Add("x-client-id", brokerConfiguration.ClientId);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", brokerConfiguration.AppToken);
         });
 
         // Register Repositories

@@ -1,7 +1,8 @@
-using System.Net.Http.Json;
 using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Interfaces.Gateways;
 using CleanTodo.Infrastructure.Configuration;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace CleanTodo.Infrastructure.Gateways;
 
@@ -17,13 +18,17 @@ public class BrokerGateway : IBrokerGateway
     }
 
     public string CreatorId => _configuration.CreatorId;
-
-    public async Task<List<PortDto>> GetPorts()
+    
+    //Merci a Mathis pour l'aide 
+    public async Task<List<string>> GetPorts()
     {
-        using var response = await _httpClient.GetAsync("ports");
+        var response = await _httpClient.GetAsync("users");
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<List<PortDto>>() ?? throw new InvalidOperationException("Le broker a retourné une réponse vide.");
+        var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        return json.GetProperty("users").Deserialize<List<string>>()
+            ?? new List<string>();
     }
 
     public Task<DeliveryOutcome> Sail(

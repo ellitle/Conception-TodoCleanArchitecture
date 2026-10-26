@@ -25,7 +25,7 @@ public class SailShipUseCase
 
         var ports = await _brokerGateway.GetPorts();
 
-        bool destinationExists = ports.Any(port => port.Id == sailShipDto.Destination);
+        bool destinationExists = ports.Contains(sailShipDto.Destination);
 
         if (!destinationExists)
         {
