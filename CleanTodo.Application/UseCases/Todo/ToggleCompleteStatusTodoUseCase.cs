@@ -1,4 +1,4 @@
-﻿using CleanTodo.Domain.DTOS;
+using CleanTodo.Domain.DTOS;
 using CleanTodo.Domain.Entities;
 using CleanTodo.Domain.Exceptions;
 using CleanTodo.Domain.Interfaces.Repositories;
@@ -20,7 +20,7 @@ public class ToggleCompleteStatusTodoUseCase
             throw new NotFoundException(id);
 
         todo.IsCompleted = !todo.IsCompleted;
-        todo.CompletedOn = todo.IsCompleted ? DateTime.UtcNow : default;
+        todo.CompletedOn = todo.IsCompleted ? DateTime.UtcNow : null;
 
         Todo updatedTodo = await _todoRepository.Update(todo);
 
