@@ -83,7 +83,6 @@ public class ShipController(
         }
     }
 
-    [Authorize]
     [HttpPost("dock")]
     public async Task<ActionResult<ShipDto>> Dock(
     [FromBody] BrokerShipDto brokerShipDto)
