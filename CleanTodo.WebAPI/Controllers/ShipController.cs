@@ -137,6 +137,7 @@ public class ShipController(
         }
     }
 
+    [Authorize]
     [HttpGet("port")]
     public async Task<ActionResult<List<string>>> Port()
     {
