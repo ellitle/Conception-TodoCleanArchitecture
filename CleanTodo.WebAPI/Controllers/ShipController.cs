@@ -83,6 +83,7 @@ public class ShipController(
         }
     }
 
+    [Authorize]
     [HttpPost("dock")]
     public async Task<ActionResult<ShipDto>> Dock(
     [FromBody] BrokerShipDto brokerShipDto)
@@ -99,6 +100,7 @@ public class ShipController(
         }
     }
 
+    [Authorize]
     [HttpPost("sail")]
     public async Task<ActionResult<ShipDto>> Sail(
         [FromQuery] Guid id,
@@ -136,6 +138,7 @@ public class ShipController(
         }
     }
 
+    [Authorize]
     [HttpGet("port")]
     public async Task<ActionResult<List<string>>> Port()
     {
